@@ -1,42 +1,40 @@
 #pragma once
 #include <string>
 #include "degree.h"
-using namespace std;
 
 class Student {
 public:
-	Student(); //Parameterless constructor
-	//Constructor
-	Student(string studentID, string firstName, string lastName, string emailAddress, int age, int* daysInCourse, DegreeProgram degreeProgram);
+    Student();
+    Student(std::string studentID, std::string firstName, std::string lastName,
+             std::string emailAddress, int age, const int daysInCourse[3],
+             DegreeProgram degreeProgram);
 
-	//Accessors
-	string getStudentID();
-	string getFirstName();
-	string getLastName();
-	string getEmailAddress();
-	int getAge();
-	int* getDaysInCourse();
-	DegreeProgram getDegreeProgram();
+    // Accessors
+    std::string getStudentID() const;
+    std::string getFirstName() const;
+    std::string getLastName() const;
+    std::string getEmailAddress() const;
+    int getAge() const;
+    const int* getDaysInCourse() const;
+    DegreeProgram getDegreeProgram() const;
 
-	//Mutators
-	void setStudentID(string studentID);
-	void setFirstName(string firstName);
-	void setLastName(string lastName);
-	void setEmailAddress(string emailAddress);
-	void setAge(int age);
-	void setDaysInCourse(int daysInCourse[]);
-	void setDegreeProgram(DegreeProgram degreeProgram);
+    // Mutators
+    void setStudentID(const std::string& studentID);
+    void setFirstName(const std::string& firstName);
+    void setLastName(const std::string& lastName);
+    void setEmailAddress(const std::string& emailAddress);
+    void setAge(int age);
+    void setDaysInCourse(const int daysInCourse[3]);
+    void setDegreeProgram(DegreeProgram degreeProgram);
 
-	//Print method
-	void print();
-
+    void print() const;
 
 private:
-	string studentID;
-	string firstName;
-	string lastName;
-	string emailAddress;
-	int age;
-	int daysInCourse[3];
-	DegreeProgram degreeProgram;
+    std::string studentID;
+    std::string firstName;
+    std::string lastName;
+    std::string emailAddress;
+    int age;
+    int daysInCourse[3];
+    DegreeProgram degreeProgram;
 };

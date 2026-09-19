@@ -1,85 +1,48 @@
 #include <iostream>
-#include <string>
 #include "student.h"
-using namespace std;
 
-//Parameterless constructor definition
-Student::Student() {
-	this->studentID = "";
-	this->firstName = "";
-	this->lastName = "";
-	this->emailAddress = "";
-	this->age = 0;
-	for (int i = 0; i < 3; ++i) {
-		this->daysInCourse[i] = 0;
-	}
-	this->degreeProgram = DegreeProgram::SOFTWARE;
+Student::Student()
+    : studentID(""), firstName(""), lastName(""), emailAddress(""),
+      age(0), daysInCourse{0, 0, 0}, degreeProgram(DegreeProgram::SOFTWARE) {
 }
 
-//Constructor definition
-Student::Student(string studentID, string firstName, string lastName, string emailAddress, int age, int* daysInCourse, DegreeProgram degreeProgram) {
-	this->studentID = studentID;
-	this->firstName = firstName;
-	this->lastName = lastName;
-	this->emailAddress = emailAddress;
-	this->age = age;
-	for (int i = 0; i < 3; ++i) {
-		this->daysInCourse[i] = daysInCourse[i];
-	}
-	this->degreeProgram = degreeProgram;
+Student::Student(std::string studentID, std::string firstName, std::string lastName,
+                  std::string emailAddress, int age, const int daysInCourse[3],
+                  DegreeProgram degreeProgram)
+    : studentID(std::move(studentID)), firstName(std::move(firstName)),
+      lastName(std::move(lastName)), emailAddress(std::move(emailAddress)),
+      age(age), degreeProgram(degreeProgram) {
+    for (int i = 0; i < 3; ++i) {
+        this->daysInCourse[i] = daysInCourse[i];
+    }
 }
 
-//Accessors
-string Student::getStudentID() {
-	return studentID;
-}
-string Student::getFirstName() {
-	return firstName;
-}
-string Student::getLastName() {
-	return lastName;
-}
-string Student::getEmailAddress() {
-	return emailAddress;
-}
-int Student::getAge() {
-	return age;
-}
-int* Student::getDaysInCourse() {
-	return daysInCourse;
-}
-DegreeProgram Student::getDegreeProgram() {
-	return degreeProgram;
-}
+std::string Student::getStudentID() const { return studentID; }
+std::string Student::getFirstName() const { return firstName; }
+std::string Student::getLastName() const { return lastName; }
+std::string Student::getEmailAddress() const { return emailAddress; }
+int Student::getAge() const { return age; }
+const int* Student::getDaysInCourse() const { return daysInCourse; }
+DegreeProgram Student::getDegreeProgram() const { return degreeProgram; }
 
-// Mutators
-void Student::setStudentID(string studentID) {
-	this->studentID = studentID;
+void Student::setStudentID(const std::string& studentID) { this->studentID = studentID; }
+void Student::setFirstName(const std::string& firstName) { this->firstName = firstName; }
+void Student::setLastName(const std::string& lastName) { this->lastName = lastName; }
+void Student::setEmailAddress(const std::string& emailAddress) { this->emailAddress = emailAddress; }
+void Student::setAge(int age) { this->age = age; }
+void Student::setDaysInCourse(const int daysInCourse[3]) {
+    for (int i = 0; i < 3; ++i) {
+        this->daysInCourse[i] = daysInCourse[i];
+    }
 }
-void Student::setFirstName(string firstName) {
-	this->firstName = firstName;
-}
-void Student::setLastName(string lastName) {
-	this->lastName = lastName;
-}
-void Student::setEmailAddress(string emailAddress) {
-	this->emailAddress = emailAddress;
-}
-void Student::setAge(int age) {
-	this->age = age;
-}
-void Student::setDaysInCourse(int daysInCourse[]) {
-	for (int i = 0; i < 3; ++i) {
-		this->daysInCourse[i] = daysInCourse[i];
-	}
-}
-void Student::setDegreeProgram(DegreeProgram degreeProgram) {
-	this->degreeProgram = degreeProgram;
-}
+void Student::setDegreeProgram(DegreeProgram degreeProgram) { this->degreeProgram = degreeProgram; }
 
-//Print method
-void Student::print() {
-	cout << getStudentID() << "\tFirst Name: " << getFirstName() << "\tLastName: " << getLastName();
-	cout << "\tAge: " << getAge() << "\tDays in Course: " << " {" << getDaysInCourse()[0] << ", ";
-	cout << getDaysInCourse()[1] << ", " << getDaysInCourse()[2] << "}" << "\tDegree Program: " << DEGREEPROGRAM[static_cast<int>(getDegreeProgram())] << endl;
+void Student::print() const {
+    std::cout << getStudentID() << "\tFirst Name: " << getFirstName()
+              << "\tLastName: " << getLastName()
+              << "\tAge: " << getAge()
+              << "\tDays in Course: {" << getDaysInCourse()[0] << ", "
+              << getDaysInCourse()[1] << ", " << getDaysInCourse()[2] << "}"
+              << "\tDegree Program: "
+              << DEGREE_PROGRAM_NAMES[static_cast<int>(getDegreeProgram())] << std::endl;
 }

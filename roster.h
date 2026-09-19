@@ -1,41 +1,31 @@
 #pragma once
-#include <iostream>
 #include <string>
+#include <vector>
 #include "student.h"
-using namespace std;
 
 class Roster {
 public:
+    Roster();
+    // No custom destructor needed: std::vector<Student> manages its own
+    // memory automatically, eliminating the manual new/delete bookkeeping
+    // the original array-of-pointers design required.
 
-	Student* classRosterArray[5]; // Array of pointers to hold student data
+    void parse(const std::string& row);
 
-	Roster(); // Constructor
-	~Roster(); // Destructor
+    void add(const std::string& studentID, const std::string& firstName,
+              const std::string& lastName, const std::string& emailAddress, int age,
+              int daysInCourse1, int daysInCourse2, int daysInCourse3,
+              DegreeProgram degreeProgram);
 
-	// Parse student data and add to the roster
-	void parse(string row); 
+    void remove(const std::string& studentID);
+    void printAll() const;
+    void printAverageDaysInCourse(const std::string& studentID) const;
+    void printInvalidEmails() const;
+    void printByDegreeProgram(DegreeProgram degreeProgram) const;
 
-	// Add to student and corresponding information to the roster
-	void add(string studentID, string firstName, string lastName, string emailAddress, int age,
-		int daysInCourse1, int daysInCourse2, int daysInCourse3, DegreeProgram degreeProgram);
-
-	// Remove from the roster
-	void remove(string studentID);
-
-	// Print all students in the roster with their corresponding information
-	void printAll();
-
-	// Print average number of days in course for a student
-	void printAverageDaysInCourse(string studentID);
-
-	// Print invalid email addresses
-	void printInvalidEmails();
-
-	// Print students by degree program
-	void printByDegreeProgram(DegreeProgram degreeProgram);
+    // Read-only access so main.cpp can iterate without exposing internals directly
+    const std::vector<Student>& getClassRosterArray() const;
 
 private:
-	
-	int lastIndex; // To track the last index filled into the array
+    std::vector<Student> classRosterArray;
 };
-

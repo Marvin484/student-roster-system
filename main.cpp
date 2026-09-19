@@ -1,38 +1,36 @@
 #include <iostream>
 #include <string>
 #include "roster.h"
-using namespace std;
 
 int main() {
-
-    // Student data table
-    const string studentData[] = {
-    "A1,John,Smith,John1989@gm ail.com,20,30,35,40,SECURITY",
-    "A2,Suzan,Erickson,Erickson_1990@gmailcom,19,50,30,40,NETWORK",
-    "A3,Jack,Napoli,The_lawyer99yahoo.com,19,20,40,33,SOFTWARE",
-    "A4,Erin,Black,Erin.black@comcast.net,22,50,58,40,SECURITY",
-    "A5,Jack,Joel,jack.joel@gmail.com,40,30,35,40,SOFTWARE"
+    const std::string studentData[] = {
+        "A1,John,Smith,John1989@gmail.com,20,30,35,40,SECURITY",
+        "A2,Suzan,Erickson,Erickson_1990@gmail.com,19,50,30,40,NETWORK",
+        "A3,Jack,Napoli,The_lawyer99yahoo.com,19,20,40,33,SOFTWARE", // intentionally malformed email to demo printInvalidEmails()
+        "A4,Erin,Black,Erin.black@comcast.net,22,50,58,40,SECURITY",
+        "A5,Jane,Doe,jane.doe@example.com,25,30,35,40,SOFTWARE"
     };
 
-    
-    Roster classRoster; // Creating an instance of the Roster class
+    std::cout << "Student Roster System" << std::endl;
+    std::cout << "Language: C++" << std::endl << std::endl;
 
-    for (int i = 0; i < 5; ++i) {
-        classRoster.parse(studentData[i]); // Add student to roster
+    Roster classRoster;
+
+    for (const auto& row : studentData) {
+        classRoster.parse(row);
     }
 
-    classRoster.printAll(); // Print all students with their corresponding information
-    classRoster.printInvalidEmails(); // Print invalid email addresses
+    classRoster.printAll();
+    classRoster.printInvalidEmails();
 
-    // Print average days in course for each student
-    for (int i = 0; i < 5; ++i) {
-        classRoster.printAverageDaysInCourse(classRoster.classRosterArray[i]->getStudentID());
+    for (const auto& student : classRoster.getClassRosterArray()) {
+        classRoster.printAverageDaysInCourse(student.getStudentID());
     }
-    
-    classRoster.printByDegreeProgram(SOFTWARE); // Print students by degree program (Students in the software program)
-    classRoster.remove("A3"); // Removing student by ID (A3)  
-    classRoster.printAll(); // Print the updated roster
-    classRoster.remove("A3"); // Try removing the same student by ID (A3) and get error
+
+    classRoster.printByDegreeProgram(DegreeProgram::SOFTWARE);
+    classRoster.remove("A3");
+    classRoster.printAll();
+    classRoster.remove("A3");
 
     return 0;
 }
