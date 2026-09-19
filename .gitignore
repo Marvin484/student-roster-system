@@ -1,0 +1,16 @@
+build/
+out/
+*.db
+*.obj
+*.exe
+*.ilk
+*.pdb
+.vs/
+.vscode/*
+!.vscode/settings.json
+CMakeFiles/
+CMakeCache.txt
+.kilo/
+.kilocode/
+.kilocodemodes
+.kilocoderules
