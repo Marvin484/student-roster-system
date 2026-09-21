@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Roster System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Student Roster System</h1>
+    <p class="subtitle">Manage students, courses, and degree programs</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Add Student</h2>
+      <form id="add-form">
+        <div class="form-grid">
+          <input type="text" id="studentId" placeholder="Student ID (e.g. A6)" required>
+          <input type="text" id="firstName" placeholder="First Name" required>
+          <input type="text" id="lastName" placeholder="Last Name" required>
+          <input type="email" id="email" placeholder="Email" required>
+          <input type="number" id="age" placeholder="Age" required min="1">
+          <select id="degreeProgram" required>
+            <option value="SECURITY">SECURITY</option>
+            <option value="NETWORK">NETWORK</option>
+            <option value="SOFTWARE">SOFTWARE</option>
+          </select>
+          <input type="number" id="days1" placeholder="Days - Course 1" required min="0">
+          <input type="number" id="days2" placeholder="Days - Course 2" required min="0">
+          <input type="number" id="days3" placeholder="Days - Course 3" required min="0">
+        </div>
+        <button type="submit">Add Student</button>
+      </form>
+      <p id="form-message" class="message"></p>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <h2>Roster</h2>
+        <div class="filter">
+          <label for="filter-select">Filter by degree:</label>
+          <select id="filter-select">
+            <option value="ALL">All</option>
+            <option value="SECURITY">SECURITY</option>
+            <option value="NETWORK">NETWORK</option>
+            <option value="SOFTWARE">SOFTWARE</option>
+          </select>
+          <button id="refresh-btn">Refresh</button>
+        </div>
+      </div>
+
+      <table id="roster-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Age</th>
+            <th>Days in Course</th>
+            <th>Avg. Days</th>
+            <th>Degree Program</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="roster-body"></tbody>
+      </table>
+      <p id="table-message" class="message"></p>
+    </section>
+
+    <section class="card">
+      <h2>Invalid Emails</h2>
+      <ul id="invalid-emails-list"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

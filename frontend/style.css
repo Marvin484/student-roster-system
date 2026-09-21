@@ -1,0 +1,82 @@
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: #f4f6f8;
+  color: #1c1c1e;
+  margin: 0;
+  padding: 0 0 3rem;
+}
+
+header {
+  background: #1c2b3a;
+  color: white;
+  padding: 1.5rem 2rem;
+}
+
+header h1 { margin: 0; font-size: 1.6rem; }
+.subtitle { margin: 0.25rem 0 0; color: #a9c0d4; font-size: 0.9rem; }
+
+main {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.card h2 { margin-top: 0; font-size: 1.1rem; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+input, select {
+  padding: 0.5rem;
+  border: 1px solid #ccd3d9;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+button:hover { background: #1d4ed8; }
+
+button.danger { background: #dc2626; padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+button.danger:hover { background: #b91c1c; }
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid #e5e9ec; }
+th { background: #f0f2f5; }
+
+.message { color: #b91c1c; font-size: 0.85rem; min-height: 1.2rem; }
+.message.success { color: #15803d; }
+
+#invalid-emails-list { padding-left: 1.2rem; color: #b91c1c; }
