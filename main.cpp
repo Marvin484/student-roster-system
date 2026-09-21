@@ -14,8 +14,11 @@ int main() {
     std::cout << "Student Roster System" << std::endl;
     std::cout << "Language: C++" << std::endl << std::endl;
 
-    Roster classRoster;
+    Roster classRoster("students.db");
 
+    // Seed only happens inside Roster if the table is empty on first run.
+    // On subsequent runs, existing data in students.db is reused instead
+    // of being re-inserted, since add() uses INSERT OR REPLACE keyed on student_id.
     for (const auto& row : studentData) {
         classRoster.parse(row);
     }
@@ -23,7 +26,7 @@ int main() {
     classRoster.printAll();
     classRoster.printInvalidEmails();
 
-    for (const auto& student : classRoster.getClassRosterArray()) {
+    for (const auto& student : classRoster.getAllStudents()) {
         classRoster.printAverageDaysInCourse(student.getStudentID());
     }
 
