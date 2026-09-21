@@ -185,7 +185,7 @@ Student Roster::rowToStudent(sqlite3_stmt* stmt) const {
 
 std::vector<Student> Roster::getAllStudents() const {
     std::vector<Student> students;
-    const char* sql = "SELECT student_id, first_name, last_name, email, age, days1, days2, days3, degree_program FROM students;";
+    const char* sql = "SELECT student_id, first_name, last_name, email, age, days1, days2, days3, degree_program FROM students ORDER BY student_id;";
     sqlite3_stmt* stmt = nullptr;
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
