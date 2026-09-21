@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <optional>
 #include "student.h"
 #include "sqlite3.h"
 
@@ -23,8 +24,17 @@ public:
     void printInvalidEmails() const;
     void printByDegreeProgram(DegreeProgram degreeProgram) const;
 
-    // Builds a fresh in-memory snapshot from the database (used by main.cpp)
+    // Data-returning methods used by the REST API (no console output)
     std::vector<Student> getAllStudents() const;
+    std::optional<Student> getStudentById(const std::string& studentID) const;
+    std::vector<Student> getStudentsByDegree(DegreeProgram degreeProgram) const;
+    std::optional<double> getAverageDaysInCourse(const std::string& studentID) const;
+    std::vector<std::string> getInvalidEmails() const;
+    bool removeById(const std::string& studentID); // same as remove() but returns success, no cout
+
+    static bool isValidEmail(const std::string& email);
+    static std::string degreeProgramToString(DegreeProgram dp);
+    static DegreeProgram stringToDegreeProgram(const std::string& s);
 
 private:
     sqlite3* db;
@@ -32,7 +42,4 @@ private:
     void createTableIfNotExists();
     bool isEmpty() const;
     Student rowToStudent(sqlite3_stmt* stmt) const;
-
-    static std::string degreeProgramToString(DegreeProgram dp);
-    static DegreeProgram stringToDegreeProgram(const std::string& s);
 };

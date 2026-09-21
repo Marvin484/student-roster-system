@@ -45,7 +45,6 @@ bool Roster::isEmpty() const {
     const char* sql = "SELECT COUNT(*) FROM students;";
     sqlite3_stmt* stmt = nullptr;
     bool empty = true;
-
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
         if (sqlite3_step(stmt) == SQLITE_ROW) {
             empty = sqlite3_column_int(stmt, 0) == 0;
@@ -64,6 +63,12 @@ DegreeProgram Roster::stringToDegreeProgram(const std::string& s) {
     if (s == "NETWORK") return DegreeProgram::NETWORK;
     if (s == "SOFTWARE") return DegreeProgram::SOFTWARE;
     throw std::invalid_argument("Unknown degree program: " + s);
+}
+
+bool Roster::isValidEmail(const std::string& email) {
+    return email.find(' ') == std::string::npos &&
+           email.find('@') != std::string::npos &&
+           email.find('.') != std::string::npos;
 }
 
 void Roster::parse(const std::string& row) {
@@ -141,21 +146,21 @@ void Roster::add(const std::string& studentID, const std::string& firstName,
     sqlite3_finalize(stmt);
 }
 
-void Roster::remove(const std::string& studentID) {
+bool Roster::removeById(const std::string& studentID) {
     const char* sql = "DELETE FROM students WHERE student_id = ?;";
     sqlite3_stmt* stmt = nullptr;
-
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare delete: " << sqlite3_errmsg(db) << std::endl;
-        return;
+        return false;
     }
-
     sqlite3_bind_text(stmt, 1, studentID.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_step(stmt);
     int changed = sqlite3_changes(db);
     sqlite3_finalize(stmt);
+    return changed > 0;
+}
 
-    if (changed > 0) {
+void Roster::remove(const std::string& studentID) {
+    if (removeById(studentID)) {
         std::cout << "Removing " << studentID << std::endl;
     } else {
         std::cout << "Student with ID " << studentID << " was not found." << std::endl;
@@ -175,7 +180,6 @@ Student Roster::rowToStudent(sqlite3_stmt* stmt) const {
     };
     std::string degreeStr = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 8));
     DegreeProgram degree = stringToDegreeProgram(degreeStr);
-
     return Student(studentID, firstName, lastName, email, age, days, degree);
 }
 
@@ -183,7 +187,6 @@ std::vector<Student> Roster::getAllStudents() const {
     std::vector<Student> students;
     const char* sql = "SELECT student_id, first_name, last_name, email, age, days1, days2, days3, degree_program FROM students;";
     sqlite3_stmt* stmt = nullptr;
-
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             students.push_back(rowToStudent(stmt));
@@ -193,6 +196,47 @@ std::vector<Student> Roster::getAllStudents() const {
     return students;
 }
 
+std::optional<Student> Roster::getStudentById(const std::string& studentID) const {
+    const char* sql = "SELECT student_id, first_name, last_name, email, age, days1, days2, days3, degree_program FROM students WHERE student_id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+    std::optional<Student> result;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, studentID.c_str(), -1, SQLITE_TRANSIENT);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            result = rowToStudent(stmt);
+        }
+    }
+    sqlite3_finalize(stmt);
+    return result;
+}
+
+std::vector<Student> Roster::getStudentsByDegree(DegreeProgram degreeProgram) const {
+    std::vector<Student> result;
+    for (const auto& student : getAllStudents()) {
+        if (student.getDegreeProgram() == degreeProgram) {
+            result.push_back(student);
+        }
+    }
+    return result;
+}
+
+std::optional<double> Roster::getAverageDaysInCourse(const std::string& studentID) const {
+    auto student = getStudentById(studentID);
+    if (!student) return std::nullopt;
+    const int* days = student->getDaysInCourse();
+    return (days[0] + days[1] + days[2]) / 3.0;
+}
+
+std::vector<std::string> Roster::getInvalidEmails() const {
+    std::vector<std::string> invalid;
+    for (const auto& student : getAllStudents()) {
+        if (!isValidEmail(student.getEmailAddress())) {
+            invalid.push_back(student.getEmailAddress());
+        }
+    }
+    return invalid;
+}
+
 void Roster::printAll() const {
     for (const auto& student : getAllStudents()) {
         student.print();
@@ -200,39 +244,23 @@ void Roster::printAll() const {
 }
 
 void Roster::printAverageDaysInCourse(const std::string& studentID) const {
-    const char* sql = "SELECT days1, days2, days3 FROM students WHERE student_id = ?;";
-    sqlite3_stmt* stmt = nullptr;
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
-        sqlite3_bind_text(stmt, 1, studentID.c_str(), -1, SQLITE_TRANSIENT);
-        if (sqlite3_step(stmt) == SQLITE_ROW) {
-            int d1 = sqlite3_column_int(stmt, 0);
-            int d2 = sqlite3_column_int(stmt, 1);
-            int d3 = sqlite3_column_int(stmt, 2);
-            std::cout << "Average days in course for student ID: " << studentID << " is ";
-            std::cout << std::fixed << std::setprecision(4) << (d1 + d2 + d3) / 3.0 << std::endl;
-        } else {
-            std::cout << "Student with ID " << studentID << " was not found." << std::endl;
-        }
+    auto avg = getAverageDaysInCourse(studentID);
+    if (avg) {
+        std::cout << "Average days in course for student ID: " << studentID << " is ";
+        std::cout << std::fixed << std::setprecision(4) << *avg << std::endl;
+    } else {
+        std::cout << "Student with ID " << studentID << " was not found." << std::endl;
     }
-    sqlite3_finalize(stmt);
 }
 
 void Roster::printInvalidEmails() const {
-    for (const auto& student : getAllStudents()) {
-        const std::string& email = student.getEmailAddress();
-        if (email.find(' ') != std::string::npos ||
-            email.find('@') == std::string::npos ||
-            email.find('.') == std::string::npos) {
-            std::cout << "Invalid email: " << email << std::endl;
-        }
+    for (const auto& email : getInvalidEmails()) {
+        std::cout << "Invalid email: " << email << std::endl;
     }
 }
 
 void Roster::printByDegreeProgram(DegreeProgram degreeProgram) const {
-    for (const auto& student : getAllStudents()) {
-        if (student.getDegreeProgram() == degreeProgram) {
-            student.print();
-        }
+    for (const auto& student : getStudentsByDegree(degreeProgram)) {
+        student.print();
     }
 }
