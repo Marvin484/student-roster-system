@@ -21,7 +21,7 @@ json studentToJson(const Student& s) {
 int main() {
     Roster roster("students.db");
     httplib::Server svr;
-
+    
     // Allow the frontend (served from a different origin during local dev) to call this API
     svr.set_default_headers({
         {"Access-Control-Allow-Origin", "*"},
@@ -31,7 +31,7 @@ int main() {
     svr.Options(R"(.*)", [](const httplib::Request&, httplib::Response& res) {
         res.status = 204;
     });
-
+    
     svr.Get("/students", [&](const httplib::Request&, httplib::Response& res) {
         json arr = json::array();
         for (const auto& s : roster.getAllStudents()) {
@@ -39,33 +39,11 @@ int main() {
         }
         res.set_content(arr.dump(), "application/json");
     });
-
-    svr.Get(R"(/students/([^/]+))", [&](const httplib::Request& req, httplib::Response& res) {
-        std::string id = req.matches[1];
-        auto student = roster.getStudentById(id);
-        if (!student) {
-            res.status = 404;
-            res.set_content(json{{"error", "Student not found"}}.dump(), "application/json");
-            return;
-        }
-        res.set_content(studentToJson(*student).dump(), "application/json");
-    });
-
-    svr.Get(R"(/students/([^/]+)/average)", [&](const httplib::Request& req, httplib::Response& res) {
-        std::string id = req.matches[1];
-        auto avg = roster.getAverageDaysInCourse(id);
-        if (!avg) {
-            res.status = 404;
-            res.set_content(json{{"error", "Student not found"}}.dump(), "application/json");
-            return;
-        }
-        res.set_content(json{{"studentId", id}, {"averageDays", *avg}}.dump(), "application/json");
-    });
-
+    
     svr.Get("/students/invalid-emails", [&](const httplib::Request&, httplib::Response& res) {
         res.set_content(json(roster.getInvalidEmails()).dump(), "application/json");
     });
-
+    
     svr.Get(R"(/students/degree/([^/]+))", [&](const httplib::Request& req, httplib::Response& res) {
         std::string programStr = req.matches[1];
         try {
@@ -79,6 +57,28 @@ int main() {
             res.status = 400;
             res.set_content(json{{"error", "Unknown degree program"}}.dump(), "application/json");
         }
+    });
+    
+    svr.Get(R"(/students/([^/]+)/average)", [&](const httplib::Request& req, httplib::Response& res) {
+        std::string id = req.matches[1];
+        auto avg = roster.getAverageDaysInCourse(id);
+        if (!avg) {
+            res.status = 404;
+            res.set_content(json{{"error", "Student not found"}}.dump(), "application/json");
+            return;
+        }
+        res.set_content(json{{"studentId", id}, {"averageDays", *avg}}.dump(), "application/json");
+    });
+
+    svr.Get(R"(/students/([^/]+))", [&](const httplib::Request& req, httplib::Response& res) {
+        std::string id = req.matches[1];
+        auto student = roster.getStudentById(id);
+        if (!student) {
+            res.status = 404;
+            res.set_content(json{{"error", "Student not found"}}.dump(), "application/json");
+            return;
+        }
+        res.set_content(studentToJson(*student).dump(), "application/json");
     });
 
     svr.Post("/students", [&](const httplib::Request& req, httplib::Response& res) {
